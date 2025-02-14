@@ -1,11 +1,33 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
+import { YOUTUBE_VIDEO_API } from "../utils/constants";
+import VideoCard from "./VideoCard";
+import { Link } from "react-router-dom";
 
 const VideoContainer = () => {
-  return (
-    <div>
-      Video
-    </div>
-  )
-}
+  const [videos, setVideos] = useState([]);
 
-export default VideoContainer
+  useEffect(() => {
+    getVideos();
+  }, []);
+
+  const getVideos = async () => {
+    const response = await fetch(YOUTUBE_VIDEO_API);
+    const json = await response.json();
+
+    console.log("API Response:", json);
+
+    setVideos(json.items);
+  };
+
+  return (
+    <div className=" shadow-lg flex flex-wrap px-4 ">
+      {videos.length === 0 ? (
+        <p>Loading...</p>
+      ) : (
+        videos.map((video) =><Link to={"/watch?v="+video.id} ><VideoCard key={video.id} info={video} /></Link>)
+      )}
+    </div>
+   );
+};
+
+export default VideoContainer;
