@@ -24,10 +24,14 @@ const VideoContainer = () => {
       {videos.length === 0 ? (
         <p>Loading...</p>
       ) : (
-        videos.map((video) =><Link to={"/watch?v="+video.id} ><VideoCard key={video.id} info={video} /></Link>)
+        videos.map((video) => (
+          <Link key={video.id} to={"/watch?v=" + video.id}>
+            <VideoCard info={video} />
+          </Link>
+        ))
       )}
     </div>
-   );
+  );
 };
 
 export default VideoContainer;

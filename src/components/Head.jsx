@@ -1,10 +1,49 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { IoNotificationsOutline, IoSearchOutline } from "react-icons/io5";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toggleMenu } from "../utils/appSlice";
+import { YOUTUBE_SEARCH_API } from "../utils/constants";
+import { cacheResults } from "../utils/searchSlice";
 
 const Head = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  console.log(searchQuery);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(true);
+  /**
+   * searchCache = {
+   *    "iphone" : ["iphone 11,"iphone15"]
+   * }
+   * searchQuery = iphone
+   */
+  const searchCache = useSelector((store) => store.search);
   const dispatch = useDispatch();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchCache[searchQuery]) {
+        setSuggestions(searchCache[searchQuery]);
+      } else {
+        getSearchSuggestion();
+      }
+    }, 200);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [searchQuery]);
+
+  const getSearchSuggestion = async () => {
+    const data = await fetch(YOUTUBE_SEARCH_API + searchQuery);
+    const json = await data.json();
+    // console.log(json[1]);
+    setSuggestions(json[1]);
+
+    // update cache
+    dispatch(
+      cacheResults({
+        [searchQuery]: json[1],
+      })
+    );
+  };
 
   const toggleMenuHandler = () => {
     dispatch(toggleMenu());
@@ -31,14 +70,37 @@ const Head = () => {
 
       <div className="col-span-6 flex justify-center">
         <div className="relative w-3/5">
-          <input
-            className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none"
-            type="text"
-            placeholder="Search"
-          />
-          <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-100 p-2 rounded-full hover:bg-gray-200">
-            <IoSearchOutline className="text-xl" />
-          </button>
+          <div>
+            <input
+              className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none"
+              type="text"
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => {
+                setShowSuggestions(true);
+              }}
+              onBlur={() => setShowSuggestions(false)}
+            />
+            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-100 p-2 rounded-full hover:bg-gray-200">
+              <IoSearchOutline className="text-xl" />
+            </button>
+          </div>
+          {showSuggestions && (
+            <div className="fixed bg-white py-2 px-2 w-[26rem] shadow:lg rounded-lg border-gray-100">
+              <ul>
+                {suggestions.map((s) => (
+                  <li
+                    key={s}
+                    className="flex gap-2 py-1 items-center hover:bg-gray-100"
+                  >
+                    <IoSearchOutline />
+                    {s}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
 

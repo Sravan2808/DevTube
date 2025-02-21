@@ -35,7 +35,7 @@ const VideoCard = ({ info }) => {
     return "Just now";
   };
 
-  console.log(info);
+  // console.log(info);
   const { snippet, statistics } = info;
   const { channelTitle, title, thumbnails } = snippet;
 
