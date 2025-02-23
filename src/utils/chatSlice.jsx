@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { LIVE_CHAT_COUNT } from "./constants";
 
-const chartSlice = createSlice({
+const chatSlice = createSlice({
   name: "chat",
   initialState: {
     messages: [],
@@ -13,5 +13,5 @@ const chartSlice = createSlice({
     },
   },
 });
-export const { addMessage } = chartSlice.actions;
-export default chartSlice.reducer;
+export const { addMessage } = chatSlice.actions;
+export default chatSlice.reducer;
